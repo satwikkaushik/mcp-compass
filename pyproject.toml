@@ -19,7 +19,6 @@ dependencies = [
     "pydantic[email]>=2.13.5",
     "pyjwt>=2.13.0",
     "python-multipart>=0.0.32",
-    "sentence-transformers>=6.0.1",
     "sqlmodel>=0.0.42",
     "uvicorn[standard]>=0.52.4",
 ]
