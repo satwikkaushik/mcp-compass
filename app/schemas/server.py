@@ -32,3 +32,5 @@ class McpServerRead(BaseModel):
     workspace_id: int
     created_at: datetime
     updated_at: datetime
+    connectivity_status: str | None
+    last_checked_at: datetime | None
