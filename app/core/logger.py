@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 LOG_DIR = Path("logs")
@@ -7,7 +7,7 @@ LOG_DIR = Path("logs")
 
 def setup_logging() -> None:
     LOG_DIR.mkdir(exist_ok=True)
-    log_file = LOG_DIR / f"app_{datetime.now():%Y%m%d_%H%M%S}.log"
+    log_file = LOG_DIR / f"app_{datetime.now(UTC):%Y%m%d_%H%M%S}.log"
 
     formatter = logging.Formatter(
         "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"

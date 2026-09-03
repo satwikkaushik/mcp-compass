@@ -1,11 +1,13 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.deps import check_membership, get_current_user
 from app.db.session import get_session
 from app.models.server import McpServer, McpServerVersion
+from app.models.user import User, WorkspaceMembership
 from app.schemas.server import McpServerCreate, McpServerRead, McpServerUpdate
 
 router = APIRouter(prefix="/servers", tags=["servers"])
@@ -30,8 +32,12 @@ def _snapshot_version(server: McpServer) -> McpServerVersion:
     description="Registers a new MCP server and records its initial version snapshot.",
 )
 async def publish_server(
-    payload: McpServerCreate, session: AsyncSession = Depends(get_session)
+    payload: McpServerCreate,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
+    await check_membership(current_user, payload.workspace_id, session)
+
     server = McpServer(**payload.model_dump())
     session.add(server)
     await session.flush()
@@ -46,12 +52,17 @@ async def publish_server(
     "",
     response_model=list[McpServerRead],
     summary="Discover servers",
-    description="Lists registered servers, optionally filtered by tag.",
+    description="Lists registered servers in the caller's workspaces, optionally filtered by tag.",
 )
 async def discover_servers(
-    tag: str | None = None, session: AsyncSession = Depends(get_session)
+    tag: str | None = None,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
-    stmt = select(McpServer)
+    member_workspaces = select(WorkspaceMembership.workspace_id).where(
+        WorkspaceMembership.user_id == current_user.id
+    )
+    stmt = select(McpServer).where(McpServer.workspace_id.in_(member_workspaces))
     if tag:
         stmt = stmt.where(McpServer.tags.any(tag))
     result = await session.execute(stmt)
@@ -64,10 +75,15 @@ async def discover_servers(
     summary="Get a server",
     description="Fetches a single server by its ID.",
 )
-async def get_server(server_id: int, session: AsyncSession = Depends(get_session)):
+async def get_server(
+    server_id: int,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
     server = await session.get(McpServer, server_id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
+    await check_membership(current_user, server.workspace_id, session)
     return server
 
 
@@ -81,14 +97,16 @@ async def update_server(
     server_id: int,
     payload: McpServerUpdate,
     session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
     server = await session.get(McpServer, server_id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
+    await check_membership(current_user, server.workspace_id, session)
 
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(server, field, value)
-    server.updated_at = datetime.now(timezone.utc)
+    server.updated_at = datetime.now(UTC)
 
     session.add(server)
     await session.flush()
@@ -105,9 +123,16 @@ async def update_server(
     summary="Delete a server",
     description="Deletes a server and its version history.",
 )
-async def delete_server(server_id: int, session: AsyncSession = Depends(get_session)):
+async def delete_server(
+    server_id: int,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
     server = await session.get(McpServer, server_id)
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
+    await check_membership(
+        current_user, server.workspace_id, session, required_role="admin"
+    )
     await session.delete(server)
     await session.commit()
