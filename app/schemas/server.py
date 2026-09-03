@@ -4,11 +4,11 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class McpServerCreate(BaseModel):
-    name: str
-    description: str
-    endpoint_url: str
-    version: str = "0.1.0"
-    tags: list[str] = Field(default_factory=list)
+    name: str = Field(examples=["github-webhook-validator"])
+    description: str = Field(examples=["Validates and parses GitHub webhook payloads"])
+    endpoint_url: str = Field(examples=["http://localhost:9000/mcp"])
+    version: str = Field(default="0.1.0", examples=["0.1.0"])
+    tags: list[str] = Field(default_factory=list, examples=[["github", "webhooks"]])
 
 
 class McpServerUpdate(BaseModel):

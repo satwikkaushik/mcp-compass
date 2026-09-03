@@ -22,7 +22,13 @@ def _snapshot_version(server: McpServer) -> McpServerVersion:
     )
 
 
-@router.post("", response_model=McpServerRead, status_code=201)
+@router.post(
+    "",
+    response_model=McpServerRead,
+    status_code=201,
+    summary="Publish a server",
+    description="Registers a new MCP server and records its initial version snapshot.",
+)
 async def publish_server(
     payload: McpServerCreate, session: AsyncSession = Depends(get_session)
 ):
@@ -36,7 +42,12 @@ async def publish_server(
     return server
 
 
-@router.get("", response_model=list[McpServerRead])
+@router.get(
+    "",
+    response_model=list[McpServerRead],
+    summary="Discover servers",
+    description="Lists registered servers, optionally filtered by tag.",
+)
 async def discover_servers(
     tag: str | None = None, session: AsyncSession = Depends(get_session)
 ):
@@ -47,7 +58,12 @@ async def discover_servers(
     return result.scalars().all()
 
 
-@router.get("/{server_id}", response_model=McpServerRead)
+@router.get(
+    "/{server_id}",
+    response_model=McpServerRead,
+    summary="Get a server",
+    description="Fetches a single server by its ID.",
+)
 async def get_server(server_id: int, session: AsyncSession = Depends(get_session)):
     server = await session.get(McpServer, server_id)
     if not server:
@@ -55,7 +71,12 @@ async def get_server(server_id: int, session: AsyncSession = Depends(get_session
     return server
 
 
-@router.patch("/{server_id}", response_model=McpServerRead)
+@router.patch(
+    "/{server_id}",
+    response_model=McpServerRead,
+    summary="Update a server",
+    description="Updates a server's fields and records a new version snapshot.",
+)
 async def update_server(
     server_id: int,
     payload: McpServerUpdate,
@@ -78,7 +99,12 @@ async def update_server(
     return server
 
 
-@router.delete("/{server_id}", status_code=204)
+@router.delete(
+    "/{server_id}",
+    status_code=204,
+    summary="Delete a server",
+    description="Deletes a server and its version history.",
+)
 async def delete_server(server_id: int, session: AsyncSession = Depends(get_session)):
     server = await session.get(McpServer, server_id)
     if not server:
