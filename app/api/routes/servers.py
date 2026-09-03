@@ -9,6 +9,7 @@ from app.db.session import get_session
 from app.models.server import McpServer, McpServerVersion
 from app.models.user import User, WorkspaceMembership
 from app.schemas.server import McpServerCreate, McpServerRead, McpServerUpdate
+from app.services.embeddings import embed_server
 from app.services.mcp_validator import validate_mcp_server
 
 router = APIRouter(prefix="/servers", tags=["servers"])
@@ -45,6 +46,8 @@ async def publish_server(
 
     server.connectivity_status = await validate_mcp_server(server.endpoint_url)
     server.last_checked_at = datetime.now(UTC)
+
+    server.embedding = embed_server(server.name, server.description, server.tags)
 
     session.add(_snapshot_version(server))
     await session.commit()
@@ -114,6 +117,8 @@ async def update_server(
 
     server.connectivity_status = await validate_mcp_server(server.endpoint_url)
     server.last_checked_at = datetime.now(UTC)
+
+    server.embedding = embed_server(server.name, server.description, server.tags)
 
     session.add(server)
     await session.flush()
