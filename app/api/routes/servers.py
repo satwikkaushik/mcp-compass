@@ -9,6 +9,7 @@ from app.db.session import get_session
 from app.models.server import McpServer, McpServerVersion
 from app.models.user import User, WorkspaceMembership
 from app.schemas.server import McpServerCreate, McpServerRead, McpServerUpdate
+from app.services.mcp_validator import validate_mcp_server
 
 router = APIRouter(prefix="/servers", tags=["servers"])
 
@@ -41,6 +42,9 @@ async def publish_server(
     server = McpServer(**payload.model_dump())
     session.add(server)
     await session.flush()
+
+    server.connectivity_status = await validate_mcp_server(server.endpoint_url)
+    server.last_checked_at = datetime.now(UTC)
 
     session.add(_snapshot_version(server))
     await session.commit()
@@ -107,6 +111,9 @@ async def update_server(
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(server, field, value)
     server.updated_at = datetime.now(UTC)
+
+    server.connectivity_status = await validate_mcp_server(server.endpoint_url)
+    server.last_checked_at = datetime.now(UTC)
 
     session.add(server)
     await session.flush()

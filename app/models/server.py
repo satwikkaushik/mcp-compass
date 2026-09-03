@@ -23,6 +23,11 @@ class McpServer(SQLModel, table=True):
         default_factory=lambda: datetime.now(UTC),
         sa_column=Column(DateTime(timezone=True), nullable=False),
     )
+    connectivity_status: str | None = Field(default=None)
+    last_checked_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True), nullable=True),
+    )
 
 
 class McpServerVersion(SQLModel, table=True):
