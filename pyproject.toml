@@ -1,0 +1,15 @@
+[project]
+name = "mcp-compass"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.19.1",
+    "asyncpg>=0.31.0",
+    "fastapi>=0.141.1",
+    "pydantic-settings>=2.15.0",
+    "python-multipart>=0.0.32",
+    "sqlmodel>=0.0.42",
+    "uvicorn[standard]>=0.52.4",
+]
