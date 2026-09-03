@@ -20,3 +20,7 @@ def embed_server(
     vector = _get_model().encode(document)
 
     return vector.tolist()
+
+
+def embed_text(text: str) -> list[float]:
+    return _get_model().encode(text).tolist()
