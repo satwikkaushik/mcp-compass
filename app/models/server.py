@@ -1,6 +1,7 @@
 # app/models/server.py — replace the full file
 from datetime import UTC, datetime
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import ARRAY, Column, DateTime, String
 from sqlmodel import Field, SQLModel
 
@@ -28,6 +29,7 @@ class McpServer(SQLModel, table=True):
         default=None,
         sa_column=Column(DateTime(timezone=True), nullable=True),
     )
+    embedding: list[float] | None = Field(default=None, sa_column=Column(Vector(384)))
 
 
 class McpServerVersion(SQLModel, table=True):
