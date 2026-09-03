@@ -1,0 +1,14 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio.engine import create_async_engine
+from sqlalchemy.ext.asyncio.session import async_sessionmaker
+
+from app.core.config import settings
+
+engine = create_async_engine(settings.database_url, echo=False)
+
+async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+
+
+async def get_session():
+    async with async_session_maker() as session:
+        yield session
