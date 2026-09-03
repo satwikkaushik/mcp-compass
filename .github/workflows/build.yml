@@ -24,4 +24,4 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Build Docker Image
-        run: docker build -f docker/Dockerfile -t mcp-compass:ci
+        run: docker build -f docker/Dockerfile -t mcp-compass:ci .
