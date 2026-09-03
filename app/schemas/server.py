@@ -9,6 +9,7 @@ class McpServerCreate(BaseModel):
     endpoint_url: str = Field(examples=["http://localhost:9000/mcp"])
     version: str = Field(default="0.1.0", examples=["0.1.0"])
     tags: list[str] = Field(default_factory=list, examples=[["github", "webhooks"]])
+    workspace_id: int
 
 
 class McpServerUpdate(BaseModel):
@@ -28,5 +29,6 @@ class McpServerRead(BaseModel):
     endpoint_url: str
     version: str
     tags: list[str]
+    workspace_id: int
     created_at: datetime
     updated_at: datetime
