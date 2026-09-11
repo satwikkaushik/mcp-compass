@@ -26,24 +26,6 @@ MCP standardizes how LLM applications talk to tools and data, but as an org accu
 
 ![MCP Compass Architecture](./mcp_compass_architecture.png)
 
-```
-                         ┌──────────────┐
-   client / curl ──────► │   FastAPI    │
-                         │  (JWT + RBAC)│
-                         └──────┬───────┘
-                                │
-              ┌─────────────────┼─────────────────┐
-              ▼                 ▼                 ▼
-     ┌────────────────┐ ┌───────────────┐ ┌─────────────────┐
-     │  Postgres +     │ │  MCP client    │ │  Gemini API      │
-     │  pgvector       │ │  (validator)   │ │  (embeddings +   │
-     │  servers, users,│ │  ─── initialize│ │   generation)    │
-     │  versions,      │ │      + list_   │ │                  │
-     │  embeddings     │ │      tools ──► │ │                  │
-     └─────────────────┘ │  target MCP    │ └─────────────────┘
-                          │  server        │
-                          └───────────────┘
-```
 
 ## Tech stack
 
