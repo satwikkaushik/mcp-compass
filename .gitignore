@@ -224,3 +224,6 @@ handoff.md
 # logs
 logs/
 *.log
+
+# Mac
+.DS_Store

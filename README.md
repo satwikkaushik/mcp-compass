@@ -24,6 +24,8 @@ MCP standardizes how LLM applications talk to tools and data, but as an org accu
 
 ## Architecture
 
+![MCP Compass Architecture](./mcp_compass_architecture.png)
+
 ```
                          ┌──────────────┐
    client / curl ──────► │   FastAPI    │
