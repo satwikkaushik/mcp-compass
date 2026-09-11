@@ -69,6 +69,8 @@ Full interactive docs at `/docs` once running.
 
 ## Running it
 
+Copy `.env.example` to `.env` and fill in values.
+
 ### Docker (recommended)
 
 ```bash
